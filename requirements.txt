@@ -1,0 +1,5 @@
+apache-beam==2.9.0
+google-cloud-pubsub==0.35.4
+numpy
+pandas
+tabulate
