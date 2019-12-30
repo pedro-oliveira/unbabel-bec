@@ -1,0 +1,48 @@
+image: docker:19.03.0
+
+stages:
+- build
+- release
+- release-tag
+
+variables:
+  DOCKER_DRIVER: overlay2
+  # Create the certificates inside this directory for both the server
+  # and client. The certificates used by the client will be created in
+  # /certs/client so we only need to share this directory with the
+  # volume mount in `config.toml`.
+  DOCKER_TLS_CERTDIR: "/certs"
+  IMAGE_NAME: "unbabel-bec"
+  SERVER_TEST_IMAGE_PUSH: $CI_REGISTRY/$IMAGE_NAME:test
+  SERVER_RELEASE_IMAGE: $CI_REGISTRY/$IMAGE_NAME:latest
+  SERVER_RELEASE_TAG_IMAGE: $CI_REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG
+
+services:
+  - docker:19.03.0-dind
+
+before_script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+
+build:
+  stage: build
+  script:
+    - docker build --network=host --pull -t $SERVER_TEST_IMAGE_PUSH  .
+    - docker push $SERVER_TEST_IMAGE_PUSH
+
+release:
+  stage: release
+  script:
+    - docker pull $SERVER_TEST_IMAGE_PUSH
+    - docker tag $SERVER_TEST_IMAGE_PUSH $SERVER_RELEASE_IMAGE
+    - docker push $SERVER_RELEASE_IMAGE
+  only:
+    - master
+
+release-tag:
+  stage: release-tag
+  script:
+    - docker pull $SERVER_TEST_IMAGE_PUSH
+    - docker tag $SERVER_TEST_IMAGE_PUSH $SERVER_RELEASE_TAG_IMAGE
+    - docker push $SERVER_RELEASE_TAG_IMAGE
+  only:
+    - tags
