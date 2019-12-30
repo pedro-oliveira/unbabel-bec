@@ -1,5 +1,7 @@
 # Backend Engineering Challenge 2.0
 
+[![pipeline status](https://gitlab.com/psoliveira/unbabel-bec/badges/master/pipeline.svg)](https://gitlab.com/psoliveira/unbabel-bec/commits/master)
+
 This project contains a solution to the Unbabel's [Backend Engineering Challenge](https://github.com/Unbabel/backend-engineering-challenge/blob/master/README.md) 
 reformulated to a more realistic context, in which the translation events arrive in real time.  
 
