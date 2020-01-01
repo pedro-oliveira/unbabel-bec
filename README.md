@@ -9,10 +9,10 @@ More details will be provided here in the following days.
 
 ## To Do List
 
-- [x] Formulate problem to solve, choose tecnologies to use and define 
+- [x] Formulate problem to solve, choose technologies to use and define 
 architecture.
-- [x] Solution to single file problem (`bec.py`).
-- [x] Solution to streaming problem (`bec_streaming.py`).
+- [x] Solution to batch pipeline problem (`batch_pipeline.py`).
+- [x] Solution to streaming pipeline problem (`streaming_pipeline.py`).
 - [x] Containerize project code ([psoliveira/unbabel-bec](https://hub.docker.com/repository/docker/psoliveira/unbabel-bec/)).
 - [x] Setup CI using GitLab CI ([Pipelines](https://gitlab.com/psoliveira/unbabel-bec/pipelines)).
 - [ ] Write **README.md**.

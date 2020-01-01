@@ -17,6 +17,7 @@ from apache_beam.options.pipeline_options import StandardOptions
 # from code import JsonCoder, AddTimestampDoFn
 import json
 import time
+from datetime import datetime
 
 
 class JsonCoder(object):
@@ -93,10 +94,7 @@ class FormatDoFn(beam.DoFn):
     def process(self, element, window=beam.DoFn.WindowParam,
                 timestamp=beam.DoFn.TimestampParam):
         ts_format = '%Y-%m-%d %H:%M:%S'
-        # window_start = window.start.to_utc_datetime().strftime(ts_format)
         window_end = window.end.to_utc_datetime().strftime(ts_format)
-        # ts_datetime = datetime.utcfromtimestamp(timestamp)
-        # ts_str = ts_datetime.strftime(ts_format)
         element['date'] = window_end
         return [element]
 
@@ -105,32 +103,29 @@ def run(argv=None, save_main_session=True):
     """Build and run the pipeline."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--output_topic', required=True,
-        help=('Output PubSub topic of the form '
-              '"projects/<PROJECT>/topics/<TOPIC>".'))
+        '--input_topic',
+        required=True,
+        help='Input PubSub topic like "projects/<PROJECT>/topics/<TOPIC>".'
+    )
+    parser.add_argument(
+        '--output_topic',
+        required=True,
+        help='Output PubSub topic like "projects/<PROJECT>/topics/<TOPIC>".'
+    )
     parser.add_argument(
         '--window_size',
         required=False,
         type=int,
         default=600,
-        help='Window size (in seconds) to apply to metrics calculations'
+        help='Window size (in seconds) to apply to metrics calculations.'
     )
     parser.add_argument(
         '--window_period',
         required=False,
         type=int,
         default=60,
-        help='Window period (in seconds) to apply to metrics calculations'
+        help='Window period (in seconds) to apply to metrics calculations.'
     )
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        '--input_topic',
-        help=('Input PubSub topic of the form '
-              '"projects/<PROJECT>/topics/<TOPIC>".'))
-    group.add_argument(
-        '--input_subscription',
-        help=('Input PubSub subscription of the form '
-              '"projects/<PROJECT>/subscriptions/<SUBSCRIPTION>."'))
     known_args, pipeline_args = parser.parse_known_args(argv)
 
     # We use the save_main_session option because one or more DoFn's in this
@@ -141,12 +136,7 @@ def run(argv=None, save_main_session=True):
     p = beam.Pipeline(options=pipeline_options)
 
     # Read from PubSub into a PCollection.
-    if known_args.input_subscription:
-        messages = p | beam.io.ReadFromPubSub(
-            subscription=known_args.input_subscription)
-
-    else:
-        messages = p | beam.io.ReadFromPubSub(topic=known_args.input_topic)
+    messages = p | beam.io.ReadFromPubSub(topic=known_args.input_topic)
 
     lines = messages | 'Decode' >> beam.Map(lambda x: JSON_CODER.decode(x))
 
