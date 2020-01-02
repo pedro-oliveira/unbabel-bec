@@ -30,11 +30,9 @@ before_script:
 build:
   stage: build
   script:
-    - docker build --network=host --pull -t $TEST_IMAGE_BATCH \
-      -f batch/Dockerfile .
+    - docker build --network=host --pull -t $TEST_IMAGE_BATCH -f batch/Dockerfile .
     - docker push $TEST_IMAGE_BATCH
-    - docker build --network=host --pull -t $TEST_IMAGE_STREAMING \
-      -f streaming/Dockerfile .
+    - docker build --network=host --pull -t $TEST_IMAGE_STREAMING -f streaming/Dockerfile .
     - docker push $TEST_IMAGE_STREAMING
 
 release:
