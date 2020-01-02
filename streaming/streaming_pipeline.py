@@ -4,20 +4,15 @@
 The Streaming workflow of the Backend Engineering Challenge.
 """
 
-from __future__ import absolute_import, division
-
 import argparse
+from datetime import datetime
+import json
 import logging
 
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 from apache_beam.options.pipeline_options import StandardOptions
-
-# from code import JsonCoder, AddTimestampDoFn
-import json
-import time
-from datetime import datetime
 
 
 class JsonCoder(object):
@@ -52,8 +47,7 @@ class AddTimestampDoFn(beam.DoFn):
         ts_format = '%Y-%m-%d %H:%M:%S.%f'
         evt_ts_str = element['timestamp']
         evt_datetime = datetime.strptime(evt_ts_str, ts_format)
-        # datetime.timestamp() only from py3.3 onwards
-        evt_ts = time.mktime(evt_datetime.timetuple())
+        evt_ts = evt_datetime.timestamp()
         # set the current element with the specified TimestampedValue
         yield beam.window.TimestampedValue(element, evt_ts)
 

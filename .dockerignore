@@ -1,0 +1,7 @@
+data/
+py37/
+*.md
+*.yml
+.git
+.gitignore
+.idea

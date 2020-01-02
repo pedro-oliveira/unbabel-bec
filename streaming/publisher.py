@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 import argparse
-import time
-from google.cloud import pubsub_v1
-from random import randint
-import numpy as np
-import uuid
 from datetime import datetime
 import json
+import numpy as np
+from random import randint
+import time
+import uuid
 
+from google.cloud import pubsub_v1
 
 # language codes used for generating test sets
 languages = ['en', 'pt', 'es', 'fr', 'it']

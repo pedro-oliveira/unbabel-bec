@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
-from google.cloud import pubsub_v1
 import json
+
+from google.cloud import pubsub_v1
 
 
 def subscribe(project_id, subscription_name):

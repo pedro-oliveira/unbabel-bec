@@ -12,10 +12,14 @@ variables:
   # /certs/client so we only need to share this directory with the
   # volume mount in `config.toml`.
   DOCKER_TLS_CERTDIR: "/certs"
-  IMAGE_NAME: "unbabel-bec"
-  SERVER_TEST_IMAGE_PUSH: $CI_REGISTRY/$IMAGE_NAME:test
-  SERVER_RELEASE_IMAGE: $CI_REGISTRY/$IMAGE_NAME:latest
-  SERVER_RELEASE_TAG_IMAGE: $CI_REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG
+  IMAGE_BATCH: "unbabel-batch"
+  IMAGE_STREAMING: "unbabel-streaming"
+  TEST_IMAGE_BATCH: $CI_REGISTRY/$IMAGE_BATCH:test
+  RELEASE_IMAGE_BATCH: $CI_REGISTRY/$IMAGE_BATCH:latest
+  RELEASE_TAG_IMAGE_BATCH: $CI_REGISTRY/$IMAGE_BATCH:$CI_COMMIT_TAG
+  TEST_IMAGE_STREAMING: $CI_REGISTRY/$IMAGE_STREAMING:test
+  RELEASE_IMAGE_STREAMING: $CI_REGISTRY/$IMAGE_STREAMING:latest
+  RELEASE_TAG_IMAGE_STREAMING: $CI_REGISTRY/$IMAGE_STREAMING:$CI_COMMIT_TAG
 
 services:
   - docker:19.03.0-dind
@@ -26,23 +30,33 @@ before_script:
 build:
   stage: build
   script:
-    - docker build --network=host --pull -t $SERVER_TEST_IMAGE_PUSH  .
-    - docker push $SERVER_TEST_IMAGE_PUSH
+    - docker build --network=host --pull -t $TEST_IMAGE_BATCH \
+      -f batch/Dockerfile .
+    - docker push $TEST_IMAGE_BATCH
+    - docker build --network=host --pull -t $TEST_IMAGE_STREAMING \
+      -f streaming/Dockerfile .
+    - docker push $TEST_IMAGE_STREAMING
 
 release:
   stage: release
   script:
-    - docker pull $SERVER_TEST_IMAGE_PUSH
-    - docker tag $SERVER_TEST_IMAGE_PUSH $SERVER_RELEASE_IMAGE
-    - docker push $SERVER_RELEASE_IMAGE
+    - docker pull $TEST_IMAGE_BATCH
+    - docker tag $TEST_IMAGE_BATCH $RELEASE_IMAGE_BATCH
+    - docker push $RELEASE_IMAGE_BATCH
+    - docker pull $TEST_IMAGE_STREAMING
+    - docker tag $TEST_IMAGE_STREAMING $RELEASE_IMAGE_STREAMING
+    - docker push $RELEASE_IMAGE_STREAMING
   only:
     - master
 
 release-tag:
   stage: release-tag
   script:
-    - docker pull $SERVER_TEST_IMAGE_PUSH
-    - docker tag $SERVER_TEST_IMAGE_PUSH $SERVER_RELEASE_TAG_IMAGE
-    - docker push $SERVER_RELEASE_TAG_IMAGE
+    - docker pull $TEST_IMAGE_BATCH
+    - docker tag $TEST_IMAGE_BATCH $RELEASE_TAG_IMAGE_BATCH
+    - docker push $RELEASE_TAG_IMAGE_BATCH
+    - docker pull $TEST_IMAGE_STREAMING
+    - docker tag $TEST_IMAGE_STREAMING $RELEASE_TAG_IMAGE_STREAMING
+    - docker push $RELEASE_TAG_IMAGE_STREAMING
   only:
     - tags

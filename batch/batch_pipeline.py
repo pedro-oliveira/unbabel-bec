@@ -75,8 +75,6 @@ class FormatDoFn(beam.DoFn):
         window_end = window.end.to_utc_datetime().strftime(ts_format)
         key, total_duration, nr_events, avg_duration = element
         return [{'date': window_end,
-                 'total_duration': total_duration,
-                 'nr_events': nr_events,
                  'average_delivery_time': avg_duration}]
 
 
