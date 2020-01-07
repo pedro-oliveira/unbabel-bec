@@ -31,5 +31,5 @@ architecture.
 - [ ] Write **README.md**.
 - [ ] Add Tests.
 - [ ] Add test stage to CI pipeline.
-- [ ] Deploy project in a Kubernetes cluster.
+- [x] Added `.yaml` files (`streaming/k8s`) for deploying architecture in a Kubernetes cluster.
 - [ ] Finalize **README.md**.
