@@ -1,0 +1,39 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streaming-pipeline
+spec:
+  selector:
+    matchLabels:
+      app: streaming
+  template:
+    metadata:
+      labels:
+        app: streaming
+    spec:
+      containers:      
+      - name: streaming
+        image: psoliveira/unbabel-streaming
+        tty: true
+        command: ["python"]
+        args: ["streaming_pipeline.py", 
+        "--input_topic", "projects/$(SECRET_PROJECT)/topics/cron-topic", 
+        "--output_topic", "projects/$(SECRET_PROJECT)/topics/hello_topic",
+        "--window_size", "600", 
+        "--window_period", "60"]
+        volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/keys
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /etc/keys/keys.json        
+          - name: SECRET_PROJECT
+            valueFrom:
+              secretKeyRef:
+                name: gcp-project
+                key: project
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: gcp-svc-key

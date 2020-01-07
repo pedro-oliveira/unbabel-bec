@@ -1,0 +1,38 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: publisher-microsoft
+spec:
+  selector:
+    matchLabels:
+      app: publisher
+  template:
+    metadata:
+      labels:
+        app: publisher
+        client: microsoft
+    spec:
+      containers:      
+      - name: publisher
+        image: psoliveira/unbabel-streaming
+        tty: true
+        command: ["python"]
+        args: ["publisher.py", "$(SECRET_PROJECT)", 
+        "cron-topic", "microsoft", "--max_nr_words", "200", 
+        "--max_duration", "60", "--max_sleep_time", "180"]
+        volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/keys
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /etc/keys/keys.json        
+          - name: SECRET_PROJECT
+            valueFrom:
+              secretKeyRef:
+                name: gcp-project
+                key: project
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: gcp-svc-key

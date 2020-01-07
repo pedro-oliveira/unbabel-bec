@@ -1,0 +1,38 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: publisher-facebook
+spec:
+  selector:
+    matchLabels:
+      app: publisher
+  template:
+    metadata:
+      labels:
+        app: publisher
+        client: facebook
+    spec:
+      containers:      
+      - name: publisher
+        image: psoliveira/unbabel-streaming
+        tty: true
+        command: ["python"]
+        args: ["publisher.py", "$(SECRET_PROJECT)", 
+        "cron-topic", "facebook", "--max_nr_words", "250", 
+        "--max_duration", "40", "--max_sleep_time", "40"]
+        volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/keys
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /etc/keys/keys.json        
+          - name: SECRET_PROJECT
+            valueFrom:
+              secretKeyRef:
+                name: gcp-project
+                key: project
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: gcp-svc-key

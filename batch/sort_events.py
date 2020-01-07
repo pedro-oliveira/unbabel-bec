@@ -29,7 +29,8 @@ def run():
 
     # parse the input file from the command line
     parser = argparse.ArgumentParser()
-    parser.add_argument(dest='input_file', help='Input file to sort')
+    parser.add_argument(dest='input_file',
+                        help='Input file to sort in the .jsonl format.')
     args = parser.parse_args()
 
     # read the jsonlines file into a pandas.DataFrame and sort by timestamp

@@ -1,0 +1,36 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscriber
+spec:
+  selector:
+    matchLabels:
+      app: subscriber
+  template:
+    metadata:
+      labels:
+        app: subscriber
+    spec:
+      containers:      
+      - name: subscriber
+        image: psoliveira/unbabel-streaming
+        tty: true
+        command: ["python"]
+        args: ["subscriber.py", "$(SECRET_PROJECT)", 
+        "sub_one"]
+        volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/keys
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /etc/keys/keys.json        
+          - name: SECRET_PROJECT
+            valueFrom:
+              secretKeyRef:
+                name: gcp-project
+                key: project
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: gcp-svc-key
